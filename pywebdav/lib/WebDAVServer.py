@@ -73,11 +73,13 @@ class DAVRequestHandler(AuthServer.AuthRequestHandler, LockManager):
 
         if DATA:
             try:
+                if isinstance(DATA, str) or isinstance(DATA, six.text_type):
+                    DATA = DATA.encode('utf-8')
                 if 'gzip' in self.headers.get('Accept-Encoding', '').split(',') \
                         and len(DATA) > self.encode_threshold:
                     buffer = io.BytesIO()
                     output = gzip.GzipFile(mode='wb', fileobj=buffer)
-                    if isinstance(DATA, str) or isinstance(DATA, six.text_type):
+                    if isinstance(DATA, bytes):
                         output.write(DATA)
                     else:
                         for buf in DATA:
@@ -86,8 +88,6 @@ class DAVRequestHandler(AuthServer.AuthRequestHandler, LockManager):
                     buffer.seek(0)
                     DATA = buffer.getvalue()
                     self.send_header('Content-Encoding', 'gzip')
-                elif isinstance(DATA, str) or isinstance(DATA, six.text_type):
-                    DATA = DATA.encode('utf-8')
 
                 self.send_header('Content-Length', len(DATA))
                 self.send_header('Content-Type', ctype)
