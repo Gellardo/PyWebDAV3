@@ -183,8 +183,7 @@ class FilesystemHandler(dav_interface):
                     log.info('Serving range %s -> %s content of %s' % (range[0], range[1], uri))
                     return Resource(fp, range[1] - range[0])
             elif os.path.isdir(path):
-                msg = self._get_listing(path).encode("utf-8")
-                return Resource(BytesIO(msg), len(msg))
+                return self._get_listing(path)
             else:
                 # also raise an error for collections
                 # don't know what should happen then..

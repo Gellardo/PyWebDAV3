@@ -86,6 +86,8 @@ class DAVRequestHandler(AuthServer.AuthRequestHandler, LockManager):
                     buffer.seek(0)
                     DATA = buffer.getvalue()
                     self.send_header('Content-Encoding', 'gzip')
+                elif isinstance(DATA, str) or isinstance(DATA, six.text_type):
+                    DATA = DATA.encode('utf-8')
 
                 self.send_header('Content-Length', len(DATA))
                 self.send_header('Content-Type', ctype)
@@ -96,9 +98,7 @@ class DAVRequestHandler(AuthServer.AuthRequestHandler, LockManager):
 
         self.end_headers()
         if DATA:
-            if isinstance(DATA, str):
-                DATA = DATA.encode('utf-8')
-            if isinstance(DATA, six.text_type) or isinstance(DATA, bytes):
+            if isinstance(DATA, bytes):
                 log.debug("Don't use iterator")
                 self.wfile.write(DATA)
             else:
