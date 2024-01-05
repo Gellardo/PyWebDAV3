@@ -5,7 +5,7 @@ import six
 import logging
 import types
 import shutil
-from io import StringIO
+from io import BytesIO
 from six.moves import urllib
 from pywebdav.lib.constants import COLLECTION, OBJECT
 from pywebdav.lib.errors import *
@@ -183,8 +183,8 @@ class FilesystemHandler(dav_interface):
                     log.info('Serving range %s -> %s content of %s' % (range[0], range[1], uri))
                     return Resource(fp, range[1] - range[0])
             elif os.path.isdir(path):
-                msg = self._get_listing(path)
-                return Resource(StringIO(msg), len(msg))
+                msg = self._get_listing(path).encode("utf-8")
+                return Resource(BytesIO(msg), len(msg))
             else:
                 # also raise an error for collections
                 # don't know what should happen then..
